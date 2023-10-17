@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "979310102971",
+    "project_id": "mandaloasinoma-api",
+    "storage_bucket": "mandaloasinoma-api.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:979310102971:android:f344b3e6f49c6993921c9e",
+        "android_client_info": {
+          "package_name": "com.joyel.mandaloasinoma_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFX-nf_0luXFK0nnEFmTSBeQrGQQHrczE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
