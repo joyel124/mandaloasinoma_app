@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/data.dart';
 import '../models/book.dart';
+import '../views/book_detail_view.dart';
 
 class BookItem extends StatelessWidget {
   final Book book;
@@ -12,15 +13,27 @@ class BookItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
-          height: 190,
-          width: 128,
-          margin: const EdgeInsets.only(right: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            image: DecorationImage(
-              image: NetworkImage(book.coverImg),
-              fit: BoxFit.cover,
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BookDetail(
+                  book: book,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            height: 190,
+            width: 128,
+            margin: const EdgeInsets.only(right: 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              image: DecorationImage(
+                image: NetworkImage(book.coverImg),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
         ),

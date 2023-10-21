@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:mandaloasinoma_app/routes/routes.dart';
+import 'package:mandaloasinoma_app/services/notification_service.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -9,6 +11,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Inicializa el servicio de notificaciones
+  PushNotificationService().initialize();
+  getToken();
   runApp( MyApp());
 }
 
@@ -27,44 +32,12 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyFirestoreTestPage extends StatelessWidget {
-  // Esta función se conecta a Firestore y obtiene un documento específico.
-  void getAllBooksFromFirestore() {
-    FirebaseFirestore.instance
-        .collection('book')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      // Verifica si hay documentos en la consulta
-      if (querySnapshot.docs.isEmpty) {
-        print('No hay libros en la base de datos.');
-      } else {
-        // Itera sobre todos los documentos obtenidos
-        for (var doc in querySnapshot.docs) {
-          // Imprime los datos de cada libro/documento
-          print('Datos del libro: ${doc.data()}');
-        }
-      }
-    }).catchError((error) {
-      print("Hubo un error al obtener los libros: $error");
-    });
-  }
+void getToken() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
 
+  String? token = await messaging.getToken();
+  print("Este es tu Token: $token");
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Test Firestore'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // Llama a la función cuando se presiona el botón.
-            getAllBooksFromFirestore();
-          },
-          child: Text('Obtener datos de Firestore'),
-        ),
-      ),
-    );
-  }
+  // Para propósitos de prueba, podrías mostrar el token en la pantalla
+  // para copiarlo fácilmente. O puedes enviarlo a tu base de datos o servidor si es necesario.
 }

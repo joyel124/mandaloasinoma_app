@@ -1,19 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mandaloasinoma_app/data/data.dart';
+import 'package:mandaloasinoma_app/models/book.dart';
 import 'package:mandaloasinoma_app/models/models.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Anime extends StatefulWidget {
-  final MostPopularModel anime;
+class BookDetail extends StatefulWidget {
+  final Book book;
 
-  const Anime({Key? key, required this.anime}) : super(key: key);
+  const BookDetail({Key? key, required this.book}) : super(key: key);
 
   @override
-  State<Anime> createState() => _AnimeState();
+  State<BookDetail> createState() => _BookDetailState();
 }
 
-class _AnimeState extends State<Anime> with TickerProviderStateMixin {
+Future<void> agregarFavorito(String bookTitle) async {
+  final prefs = await SharedPreferences.getInstance();
+
+  // Obtener la lista actual de favoritos
+  List<String> favoritos = prefs.getStringList('favoritos') ?? [];
+
+  // Agregar el nuevo favorito, si no existe ya
+  if (!favoritos.contains(bookTitle)) {
+    favoritos.add(bookTitle);
+  }
+
+  // Guardar la lista modificada en las preferencias
+  await prefs.setStringList('favoritos', favoritos);
+}
+
+Future<bool> esFavorito(String titulo) async {
+  final prefs = await SharedPreferences.getInstance();
+  List<String> favoritos = prefs.getStringList('favoritos') ?? [];
+  return favoritos.contains(titulo);
+}
+
+Future<void> quitarFavorito(String bookTitle) async {
+  final prefs = await SharedPreferences.getInstance();
+
+  // Obtener la lista actual de favoritos.
+  List<String> favoritos = prefs.getStringList('favoritos') ?? [];
+
+  // Remover el título del libro de la lista de favoritos, si está presente.
+  favoritos.remove(bookTitle);
+
+  // Guardar la lista modificada en las preferencias.
+  await prefs.setStringList('favoritos', favoritos);
+}
+
+
+class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
   late AnimationController _controller;
+  bool _esFavorito = false;
+
   late final Animation<double> _animation = CurvedAnimation(
     parent: _controller,
     curve: Curves.easeInOut,
@@ -34,8 +73,30 @@ class _AnimeState extends State<Anime> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 600),
     );
     _controller.animateTo(0.2);
+    _initFavorito();
     _controllerFade.forward();
     super.initState();
+  }
+
+  Future<void> _initFavorito() async {
+    // Verifica si el libro es un favorito al inicio.
+    _esFavorito = await esFavorito(widget.book.title);
+    setState(() {}); // Si usas setState, asegúrate de que se llame solo si el estado ha cambiado para evitar reconstrucciones innecesarias.
+  }
+
+  Future<void> toggleFavorito() async {
+    if (_esFavorito) {
+      // Si ya es favorito, "des-favoritar".
+      await quitarFavorito(widget.book.title);
+    } else {
+      // Si no, entonces agregar a favoritos.
+      await agregarFavorito(widget.book.title);
+    }
+
+    // Cambia el estado y actualiza la UI.
+    setState(() {
+      _esFavorito = !_esFavorito;
+    });
   }
 
   @override
@@ -59,73 +120,13 @@ class _AnimeState extends State<Anime> with TickerProviderStateMixin {
             children: [
               Stack(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 24,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 48,
-                          width: 48,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: theme.accentColor,
-                          ),
-                          child: SvgPicture.asset(
-                            'assets/icons/perfil.svg',
-                            height: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Good Morning',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                color: theme.iconColor,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            Text(
-                              'SaulDesign',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                color: theme.accentColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        SvgPicture.asset(
-                          'assets/icons/search.svg',
-                          height: 24,
-                        ),
-                        const SizedBox(width: 16),
-                        SvgPicture.asset(
-                          'assets/icons/notifications.svg',
-                          height: 24,
-                        ),
-                      ],
-                    ),
-                  ),
                   Hero(
-                    tag: widget.anime.title,
+                    tag: widget.book.title,
                     child: Container(
                       height: 327,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: widget.anime.image,
+                          image: Image.network(widget.book.coverImg).image,
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -160,10 +161,23 @@ class _AnimeState extends State<Anime> with TickerProviderStateMixin {
                           ),
                         ),
                         const Spacer(),
-                        SvgPicture.asset(
-                          'assets/icons/favorite_2.svg',
-                          color: theme.textColor,
-                          height: 24,
+                        IconButton(
+                          onPressed: () {
+                            agregarFavorito(widget.book.title);
+                            toggleFavorito();
+                          },
+                          icon: AnimatedBuilder(
+                            animation: _controller,
+                            builder: (context, child) {
+                              return SvgPicture.asset(
+                                _esFavorito
+                                    ? 'assets/icons/favorite_fill.svg' // El corazón lleno
+                                    : 'assets/icons/favorite_2.svg', // El contorno del corazón
+                                color: theme.textColor,
+                                height: 24,
+                              );
+                            },
+                          ),
                         ),
                         const SizedBox(width: 16),
                         SvgPicture.asset(
@@ -208,14 +222,18 @@ class _AnimeState extends State<Anime> with TickerProviderStateMixin {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(
-                                  widget.anime.title,
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    fontFamily: 'Oswald',
-                                    color: theme.textColor,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w700,
+                                SizedBox(
+                                  width: 230,
+                                  child: Text(
+                                    widget.book.title,
+                                    textAlign: TextAlign.left,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontFamily: 'Oswald',
+                                      color: theme.textColor,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                                 const Spacer(),
@@ -225,7 +243,7 @@ class _AnimeState extends State<Anime> with TickerProviderStateMixin {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  '${widget.anime.score}',
+                                  '${widget.book.visits}',
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                     fontFamily: 'Poppins',
@@ -241,7 +259,7 @@ class _AnimeState extends State<Anime> with TickerProviderStateMixin {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  widget.anime.view,
+                                  widget.book.visits.toString(),
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                     fontFamily: 'Poppins',
@@ -254,7 +272,7 @@ class _AnimeState extends State<Anime> with TickerProviderStateMixin {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Syspnosis',
+                              'Resumen',
                               textAlign: TextAlign.left,
                               style: TextStyle(
                                 fontFamily: 'Oswald',
@@ -268,7 +286,7 @@ class _AnimeState extends State<Anime> with TickerProviderStateMixin {
                               axis: Axis.vertical,
                               axisAlignment: -1,
                               child: Text(
-                                widget.anime.sinpses,
+                                widget.book.description,
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
@@ -334,7 +352,7 @@ class _AnimeState extends State<Anime> with TickerProviderStateMixin {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  "Chapters",
+                  "Capitulos",
                   textAlign: TextAlign.left,
                   style: TextStyle(
                     fontFamily: 'Oswald',
@@ -344,114 +362,7 @@ class _AnimeState extends State<Anime> with TickerProviderStateMixin {
                   ),
                 ),
               ),
-              for (final chapter in widget.anime.chapters) ...[
-                Container(
-                  margin:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  padding: const EdgeInsets.all(8),
-                  height: 96,
-                  decoration: BoxDecoration(
-                    color: theme.backgroundColor,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      width: 1,
-                      color: theme.accentColor,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 84,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Image(
-                            image: chapter.image,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 13),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Chapter ${chapter.number}',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              color: theme.textColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          Text(
-                            chapter.title,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              color: theme.accentColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ],
               const SizedBox(height: 94),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: Hero(
-        tag: 'bottom_bar',
-        child: Container(
-          height: 64,
-          margin: const EdgeInsets.symmetric(
-            horizontal: 32,
-            vertical: 16,
-          ),
-          padding: const EdgeInsets.symmetric(
-            vertical: 20,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
-            color: theme.accentColor,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                blurRadius: 4,
-                offset: const Offset(0, 4), // changes position of shadow
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              SizedBox(
-                height: 24,
-                width: 24,
-                child: SvgPicture.asset(
-                  'assets/icons/home.svg',
-                ),
-              ),
-              SizedBox(
-                height: 24,
-                width: 24,
-                child: SvgPicture.asset(
-                  'assets/icons/favorite.svg',
-                ),
-              ),
-              SizedBox(
-                height: 24,
-                width: 24,
-                child: SvgPicture.asset(
-                  'assets/icons/explorer.svg',
-                ),
-              ),
             ],
           ),
         ),

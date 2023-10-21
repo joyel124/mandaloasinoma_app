@@ -54,21 +54,28 @@ class BookService {
     }
   }
 
-  // Obtener books por nombre
-  Future<List<Book>> getBooksByName(String title) async {
+  // Obtener book por nombre
+  Future<Book?> getBookByName(String title) async {
     try {
-      // Esto podría no ser óptimo dependiendo de cómo estén configurados tus índices y la cantidad de datos.
-      // Firestore no admite consultas 'LIKE', considera usar una función de búsqueda de texto completo.
+      // Realizando la consulta a la base de datos
       var querySnapshot = await _db
-          .collection('book')
+          .collection('book') // Asegúrate de que 'books' sea el nombre correcto de tu colección
           .where('title', isEqualTo: title)
+          .limit(1) // Limitamos la consulta a un solo documento
           .get();
-      return querySnapshot.docs
-          .map((doc) => Book.fromJson(doc.data()))
-          .toList();
+
+      // Verificar si encontramos al menos un libro
+      if (querySnapshot.docs.isNotEmpty) {
+        // Si encontramos un libro, lo devolvemos
+        return Book.fromJson(querySnapshot.docs.first.data() as Map<String, dynamic>);
+      } else {
+        // Si no hay resultados, devolvemos null
+        return null;
+      }
     } catch (e) {
-      print("Error al obtener libros por nombre: $e");
-      return [];
+      // Manejo de cualquier error que pueda ocurrir durante la consulta
+      print("Error al obtener el libro por nombre: $e");
+      return null; // Podrías manejar esto de manera diferente, según tus necesidades
     }
   }
 
@@ -111,7 +118,7 @@ class BookService {
       var querySnapshot = await _db
           .collection('book')
           .orderBy('visits', descending: true) // asume que "visits" es un campo en tu documento
-          .limit(10) // obtener, por ejemplo, los top 10
+          .limit(4) // obtener, por ejemplo, los top 10
           .get();
       return querySnapshot.docs
           .map((doc) => Book.fromJson(doc.data() as Map<String, dynamic>))

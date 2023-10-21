@@ -1,16 +1,34 @@
 // lib/screens/favorite_screen.dart
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mandaloasinoma_app/data/data.dart';
 import '../data/data.dart';
+import '../models/book.dart';
+import '../services/books_service.dart';
+import 'book_detail_view.dart';
 
-class Favorites extends StatelessWidget {
+Future<List<String>> obtenerFavoritos() async {
+  final prefs = await SharedPreferences.getInstance();
+
+  // Devolver la lista de favoritos o una lista vacía si no existe
+  return prefs.getStringList('favoritos') ?? [];
+}
+
+class Favorites extends StatefulWidget {
+  @override
+  State<Favorites> createState() => _FavoritesState();
+}
+
+class _FavoritesState extends State<Favorites> {
   // Esta lista es solo para demostración. En una aplicación real, estos datos vendrían de tu estado o base de datos.
-  final List<String> favoriteItems = [
-    'Manga 1',
-    'Manga 2',
-    'Doujin 1',
-    // Agrega más elementos de prueba si lo deseas
-  ];
+  late Future<List<String>> _futureFavorites;
+
+  @override
+  void initState() {
+    super.initState();
+    // Inicializa tu Future en initState.
+    _futureFavorites = obtenerFavoritos();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +44,41 @@ class Favorites extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
+        iconTheme: IconThemeData(
+          color: theme.textColor,  // elige el color que desees para el ícono
+        ),
         // Si quieres, puedes hacer que la AppBar sea transparente para un diseño más moderno
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: ListView.builder(
-        itemCount: favoriteItems.length,
-        itemBuilder: (context, index) {
-          return FavoriteItemCard(itemTitle: favoriteItems[index]);
+      body: FutureBuilder<List<String>>(
+        future: _futureFavorites,
+        builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+          // Comprobando si hay un error
+          if (snapshot.hasError) {
+            return Center(child: Text('Ocurrió un error: ${snapshot.error}'));
+          }
+
+          // Comprobando si los datos están disponibles y no son nulos
+          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+            List<String> favoriteItems = snapshot.data!;
+
+            // Si no hay elementos favoritos, muestra un mensaje.
+            if (favoriteItems.isEmpty) {
+              return Center(child: Text('No tienes ningún favorito aún.'));
+            }
+
+            // Construyendo la lista con datos reales
+            return ListView.builder(
+              itemCount: favoriteItems.length,
+              itemBuilder: (context, index) {
+                return FavoriteItemCard(itemTitle: favoriteItems[index]);
+              },
+            );
+          }
+
+          // Mientras se carga la información, muestra un indicador de progreso
+          return const Center(child: CircularProgressIndicator());
         },
       ),
     );
@@ -41,37 +86,72 @@ class Favorites extends StatelessWidget {
 }
 
 // Puedes incluir este widget en el mismo archivo o en uno separado.
-class FavoriteItemCard extends StatelessWidget {
+class FavoriteItemCard extends StatefulWidget {
   final String itemTitle;
 
-  const FavoriteItemCard({Key? key, required this.itemTitle}) : super(key: key);
+  FavoriteItemCard({Key? key, required this.itemTitle}) : super(key: key);
+
+  @override
+  _FavoriteItemCardState createState() => _FavoriteItemCardState();
+}
+
+class _FavoriteItemCardState extends State<FavoriteItemCard> {
+  late BookService bookService; // Define bookService
+
+  @override
+  void initState() {
+    super.initState();
+    bookService = BookService(); // Inicializa bookService
+  }
+
+  void navigateToDetail(Book book) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BookDetail(
+          book: book,
+        ),
+      ),
+    );
+  }
+
+  Future<void> handleTap() async {
+    try {
+      Book? book = await bookService.getBookByName(widget.itemTitle);
+      if (book != null) {
+        navigateToDetail(book);
+      } else {
+        // Manéjalo si el libro no se encuentra
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Libro no encontrado')));
+      }
+    } catch (e) {
+      // Manejar cualquier excepción que ocurra durante la búsqueda
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al buscar el libro')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(8), // Espaciado alrededor de cada tarjeta
-      elevation: 5, // Sombra alrededor de la tarjeta
+      margin: const EdgeInsets.all(8),
+      elevation: 5,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // Bordes redondeados
+        borderRadius: BorderRadius.circular(10),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-            vertical: 15, horizontal: 20), // Espaciado interno
+        contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
         title: Text(
-          itemTitle,
-          style: TextStyle(
+          widget.itemTitle,
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
         trailing: const Icon(
-          Icons.favorite, // Icono del corazón
-          color: Colors.red, // Color rojo para el corazón
-          size: 24, // Tamaño del icono
+          Icons.favorite,
+          color: Colors.red,
+          size: 24,
         ),
-        onTap: () {
-          // Acción cuando se toca la tarjeta
-          // Por ejemplo, podrías abrir la pantalla de detalles del manga o doujin
-        },
+        onTap: handleTap,
       ),
     );
   }

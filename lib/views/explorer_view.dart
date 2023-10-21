@@ -57,6 +57,9 @@ class Explorer extends StatelessWidget {
               fontWeight: FontWeight.w700,
             )),
         backgroundColor: Colors.transparent,
+        iconTheme: IconThemeData(
+          color: theme.textColor,  // elige el color que desees para el ícono
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
