@@ -29,32 +29,6 @@ class Header extends StatelessWidget {
               height: 24,
             ),
           ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Good Morning',
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  color: theme.iconColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              Text(
-                'SaulDesign',
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  color: theme.accentColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
           const Spacer(),
           SvgPicture.asset(
             'assets/icons/search.svg',

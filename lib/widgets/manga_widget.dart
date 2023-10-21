@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mandaloasinoma_app/data/data.dart';
+import 'package:mandaloasinoma_app/widgets/book_item_widget.dart';
 import '../models/book.dart';
 import '../services/books_service.dart';
 
@@ -45,7 +46,7 @@ class MangasSection extends StatelessWidget {
         const SizedBox(height: 8),
         FutureBuilder<List<Book>>(
           future: bookService
-              .getAllBooks(), // La llamada al método que recupera los libros de Firebase.
+              .getBooksByType("manga"), // La llamada al método que recupera los libros de Firebase.
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // Proporcionar un indicador de carga mientras esperamos.
@@ -68,37 +69,7 @@ class MangasSection extends StatelessWidget {
                   itemCount: books.length,
                   itemBuilder: (context, index) {
                     var book = books[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 190,
-                          width: 128,
-                          margin: const EdgeInsets.only(right: 16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            image: DecorationImage(
-                              image: NetworkImage(book.coverImg),  // Usa NetworkImage para imágenes de red.
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 16.0),
-                          child: Text(
-                            book.title,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              color: theme.textColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
+                    return BookItem(book: book);
                   },
                 ),
               );
