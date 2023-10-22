@@ -40,7 +40,7 @@ class _HeaderState extends State<Header> {
           IconButton(onPressed: () {
             showSearch(
                 context: context,
-                delegate: SearchBookDelegate()
+                delegate: SearchBookDelegate(SearchType.name)
             );
           },
           icon: SvgPicture.asset(

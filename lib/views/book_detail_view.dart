@@ -6,7 +6,7 @@ import 'package:mandaloasinoma_app/models/book.dart';
 import 'package:mandaloasinoma_app/widgets/chapter_card_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models/chapter.dart';
+import '../delegates/search_book_delegate.dart';
 
 class BookDetail extends StatefulWidget {
   final Book book;
@@ -51,7 +51,6 @@ Future<void> quitarFavorito(String bookTitle) async {
   await prefs.setStringList('favoritos', favoritos);
 }
 
-
 class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
   late AnimationController _controller;
   bool _esFavorito = false;
@@ -64,8 +63,20 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
   List<Widget> _buildGenreChips() {
     // Construyendo una lista de chips de género.
     return widget.book.genders.map((String genre) {
-      return Chip(
-        label: Text(genre),  // configuración básica, estiliza según sea necesario
+      return InkWell(
+        onTap: () {
+          // 'showSearch' inicia el 'SearchDelegate' que hemos definido.
+          showSearch(
+            context: context,
+            delegate: SearchBookDelegate(SearchType.genre), // Este es tu SearchDelegate personalizado.
+            // El query es el término de búsqueda; establecemos el género como el término inicial de búsqueda.
+            query: genre,
+          );
+        },
+        child: Chip(
+          label:
+              Text(genre), // configuración básica, estiliza según sea necesario
+        ),
       );
     }).toList();
   }
@@ -93,7 +104,8 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
   Future<void> _initFavorito() async {
     // Verifica si el libro es un favorito al inicio.
     _esFavorito = await esFavorito(widget.book.title);
-    setState(() {}); // Si usas setState, asegúrate de que se llame solo si el estado ha cambiado para evitar reconstrucciones innecesarias.
+    setState(
+        () {}); // Si usas setState, asegúrate de que se llame solo si el estado ha cambiado para evitar reconstrucciones innecesarias.
   }
 
   Future<void> toggleFavorito() async {
@@ -338,7 +350,18 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                                   ),
                                 ),
                                 const SizedBox(width: 4),
-                                Chip(label: Text(widget.book.author)),
+                                InkWell(
+                                    onTap: () {
+                                      // 'showSearch' inicia el 'SearchDelegate' que hemos definido.
+                                      showSearch(
+                                        context: context,
+                                        delegate: SearchBookDelegate(SearchType.author), // Este es tu SearchDelegate personalizado.
+                                        // El query es el término de búsqueda; establecemos el nombre del autor como el término inicial de búsqueda.
+                                        query: widget.book.author,
+                                      );
+                                    },
+                                    child:
+                                        Chip(label: Text(widget.book.author))),
                                 const SizedBox(width: 4),
                               ],
                             ),
@@ -406,7 +429,8 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                   ),
                 ),
               ),
-              if (widget.book.pages != null && widget.book.pages!.isNotEmpty) ...[
+              if (widget.book.pages != null &&
+                  widget.book.pages!.isNotEmpty) ...[
                 ChapterCard(
                   chapterName: "Capitulo 1",
                   chapterImage: widget.book.pages![0],
@@ -417,14 +441,14 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                 const SizedBox(height: 16),
                 Center(
                   child: Text(
-                      "No hay capítulos disponibles",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: theme.textColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    "No hay capítulos disponibles",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: theme.textColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ],
