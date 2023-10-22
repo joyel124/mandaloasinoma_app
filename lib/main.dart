@@ -12,8 +12,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   // Inicializa el servicio de notificaciones
-  PushNotificationService().initialize();
-  getToken();
+  await PushNotificationService.initializeApp();
+  //getToken();
   runApp( MyApp());
 }
 

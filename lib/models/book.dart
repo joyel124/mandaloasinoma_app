@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'chapter.dart';
 
 class Book {
   final String title;
@@ -11,6 +15,7 @@ class Book {
   final int visits;
   final String coverImg;
   final DateTime publicationDate;
+  final List<String>? pages;
 
   // otros campos que necesites, como descripción, capítulos, etc.
 
@@ -25,6 +30,7 @@ class Book {
     required this.visits,
     required this.coverImg,
     required this.publicationDate,
+    this.pages
     // otros campos...
   });
 
@@ -35,6 +41,12 @@ class Book {
 
     // Asegurarse de que el campo de géneros sea una lista de cadenas
     List<String> genders = List<String>.from(map['genders'] as List<dynamic>);
+    // Manejar 'pages' que podría no estar presente
+    var pagesFromJson = map['pages']; // 'json' aquí es tu Map<String, dynamic>
+    List<String>? pages;
+    if (pagesFromJson != null) {
+      pages = List<String>.from(pagesFromJson as List<dynamic>);
+    }
 
     return Book(
       title: map['title'] as String,
@@ -46,7 +58,8 @@ class Book {
       type: map['type'] as String,
       visits: map['visits'] as int,
       coverImg: map['coverImg'] as String,
-      publicationDate: publicationDate
+      publicationDate: publicationDate,
+      pages: pages
     );
   }
 
@@ -63,6 +76,7 @@ class Book {
       'visits': visits,
       'coverImg': coverImg,
       'publicationDate': publicationDate.millisecondsSinceEpoch.toString(),
+      'pages': pages ?? []
     };
   }
 }

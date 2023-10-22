@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mandaloasinoma_app/data/data.dart';
 import 'package:mandaloasinoma_app/models/book.dart';
-import 'package:mandaloasinoma_app/models/models.dart';
+import 'package:mandaloasinoma_app/widgets/chapter_card_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/chapter.dart';
 
 class BookDetail extends StatefulWidget {
   final Book book;
@@ -57,6 +60,15 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
     parent: _controller,
     curve: Curves.easeInOut,
   );
+
+  List<Widget> _buildGenreChips() {
+    // Construyendo una lista de chips de género.
+    return widget.book.genders.map((String genre) {
+      return Chip(
+        label: Text(genre),  // configuración básica, estiliza según sea necesario
+      );
+    }).toList();
+  }
 
   late final AnimationController _controllerFade = AnimationController(
     duration: const Duration(milliseconds: 765),
@@ -297,6 +309,28 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                               ),
                             ),
                             const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 6.0, // espacio entre los chips
+                              runSpacing: 6.0, // espacio entre las filas
+                              children: _buildGenreChips(),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Text(
+                                  'Autor: ',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    fontFamily: 'Oswald',
+                                    color: theme.textColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Chip(label: Text(widget.book.author)),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -362,7 +396,25 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                   ),
                 ),
               ),
-              const SizedBox(height: 94),
+              if (widget.book.pages != null && widget.book.pages!.isNotEmpty) ...[
+                ChapterCard(
+                  chapterName: "Capitulo 1",
+                  chapterImage: widget.book.pages![0],
+                ),
+              ] else ...[
+                Center(
+                  child: Text(
+                      "No hay capítulos disponibles",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        color: theme.textColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
