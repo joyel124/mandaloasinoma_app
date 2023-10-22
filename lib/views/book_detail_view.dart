@@ -284,6 +284,16 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                             ),
                             const SizedBox(height: 8),
                             Text(
+                              widget.book.title_jap,
+                              style: TextStyle(
+                                fontFamily: 'Oswald',
+                                color: theme.textColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
                               'Resumen',
                               textAlign: TextAlign.left,
                               style: TextStyle(
@@ -310,8 +320,8 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                             ),
                             const SizedBox(height: 12),
                             Wrap(
-                              spacing: 6.0, // espacio entre los chips
-                              runSpacing: 6.0, // espacio entre las filas
+                              spacing: 8.0, // espacio entre los chips
+                              runSpacing: 0, // espacio entre las filas
                               children: _buildGenreChips(),
                             ),
                             const SizedBox(height: 12),
@@ -329,6 +339,7 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                                 ),
                                 const SizedBox(width: 4),
                                 Chip(label: Text(widget.book.author)),
+                                const SizedBox(width: 4),
                               ],
                             ),
                           ],
@@ -382,7 +393,6 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
@@ -400,8 +410,11 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                 ChapterCard(
                   chapterName: "Capitulo 1",
                   chapterImage: widget.book.pages![0],
+                  pages: widget.book.pages!,
+                  title: widget.book.title,
                 ),
               ] else ...[
+                const SizedBox(height: 16),
                 Center(
                   child: Text(
                       "No hay capítulos disponibles",

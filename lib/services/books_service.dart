@@ -60,7 +60,7 @@ class BookService {
       // Realizando la consulta a la base de datos
       var querySnapshot = await _db
           .collection('book') // Asegúrate de que 'books' sea el nombre correcto de tu colección
-          .where('title', isEqualTo: title)
+          .where('title', isGreaterThanOrEqualTo: title)
           .limit(1) // Limitamos la consulta a un solo documento
           .get();
 
@@ -78,6 +78,32 @@ class BookService {
       return null; // Podrías manejar esto de manera diferente, según tus necesidades
     }
   }
+
+  Future<List<Book>> getBooksByName(String title) async {
+    List<Book> bookList = [];
+    var endTitle = title.substring(0, title.length - 1) + String.fromCharCode(title.codeUnitAt(title.length - 1) + 1);
+    try {
+      // Realizando la consulta a la base de datos
+      var querySnapshot = await _db
+          .collection('book') // Asegúrate de que 'books' sea el nombre correcto de tu colección
+          .where('title', isGreaterThanOrEqualTo: title)
+      // Aquí no limitamos la consulta, porque queremos obtener todas las coincidencias
+          .where('title', isLessThan: endTitle)
+          .get();
+
+      // Construir la lista de libros basada en la consulta
+      for (var doc in querySnapshot.docs) {
+        bookList.add(Book.fromJson(doc.data() as Map<String, dynamic>));
+      }
+
+      return bookList;
+    } catch (e) {
+      // Manejo de cualquier error que pueda ocurrir durante la consulta
+      print("Error al obtener los libros por nombre: $e");
+      return []; // Devolver una lista vacía en caso de error
+    }
+  }
+
 
   // Obtener books por género
   Future<List<Book>> getBooksByGenre(String genre) async {

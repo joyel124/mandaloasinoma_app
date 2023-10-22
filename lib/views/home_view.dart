@@ -22,7 +22,7 @@ class _HomeState extends State<Home> {
       backgroundColor: theme.backgroundColor,
       floatingActionButton: const NavBar(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      body: const SafeArea(
+      body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
