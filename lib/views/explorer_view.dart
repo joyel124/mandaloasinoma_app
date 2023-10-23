@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:mandaloasinoma_app/data/data.dart';
+import 'package:mandaloasinoma_app/routes/routes.dart';
 import '../models/author.dart';
 import '../models/genre.dart';
 import '../widgets/circle_item_widget.dart';
+import '../widgets/navbar_widget.dart';
 
-class Explorer extends StatelessWidget {
+class Explorer extends StatefulWidget {
+
+  const Explorer({Key? key}) : super(key: key);
+  @override
+  State<Explorer> createState() => _ExplorerState();
+}
+
+class _ExplorerState extends State<Explorer> {
   // Suponiendo que tienes datos de ejemplo para géneros y autores
   final List<Genre> genres = [
     Genre(
@@ -44,9 +53,35 @@ class Explorer extends StatelessWidget {
     // Agrega tantos como necesites...
   ];
 
+  late Future<List<String>> _futureFavorites;
+
+  String _selectedItem = 'explorer';
+  String _currentRoute = ExplorerRoute;
+  // El ítem inicial seleccionado, cambia según tu lógica.
+  void _onNavBarItemSelect(String item) {
+    setState(() {
+      _selectedItem = item;
+    });
+    // Aquí también puedes manejar la lógica de navegación si es necesario.
+  }
+
+  void _handleNavBarTap(String routeName) {
+    setState(() {
+      _currentRoute = routeName;
+    });
+
+    // Cambiar la página utilizando el enrutador
+    Navigator.of(context).pushReplacementNamed(routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: NavBar(
+        onItemSelected: _handleNavBarTap,  // Pasando el manejador.
+        selectedItem: _currentRoute,  // Pasando el ítem actualmente seleccionado.
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       backgroundColor: theme.backgroundColor,
       appBar: AppBar(
         title: Text('Explorar',
@@ -65,7 +100,6 @@ class Explorer extends StatelessWidget {
         child: Column(
           children: [
             // Otros elementos de la UI aquí (como la barra de búsqueda)
-
             // Sección de Géneros
             Padding(
               padding: const EdgeInsets.all(16.0),
