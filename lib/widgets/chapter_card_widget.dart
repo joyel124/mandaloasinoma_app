@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../data/data.dart';
-import '../models/chapter.dart';
 import '../views/chapter_view.dart';
 
 

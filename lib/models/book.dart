@@ -1,10 +1,7 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'chapter.dart';
-
 class Book {
+  final String id;
   final String title;
   final String title_jap;
   final String author;
@@ -20,6 +17,7 @@ class Book {
   // otros campos que necesites, como descripción, capítulos, etc.
 
   Book({
+    required this.id,
     required this.title,
     required this.title_jap,
     required this.author,
@@ -49,6 +47,7 @@ class Book {
     }
 
     return Book(
+      id: map['id'] as String,
       title: map['title'] as String,
       title_jap: map['title_jap'] as String,
       author: map['author'] as String,
@@ -66,6 +65,7 @@ class Book {
   // Convertir un objeto de tipo Manga en un mapa.
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'title': title,
       'title_jap': title_jap,
       'author': author,

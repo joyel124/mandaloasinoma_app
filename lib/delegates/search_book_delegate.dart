@@ -122,7 +122,9 @@ class SearchBookDelegate extends SearchDelegate {
                 ),
                 itemCount: books.length,
                 itemBuilder: (context, index) {
-                  return BookItem(book: books[index]);
+                  return InkWell(
+                      child: BookItem(book: books[index])
+                  );
                 },
               ),
             );
