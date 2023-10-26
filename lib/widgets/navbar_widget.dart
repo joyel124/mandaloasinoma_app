@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import '../data/data.dart';
 import '../routes/routes.dart';
 
@@ -34,7 +33,6 @@ class NavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color inactiveColor = Colors.white.withOpacity(0.5);
-    final Color activeColor = theme.accentColor;
     return Hero(
       tag: 'bottom_bar',
       child: Container(

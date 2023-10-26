@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../data/data.dart';
 
 // Paso 1: Convertir ChapterView en un StatefulWidget

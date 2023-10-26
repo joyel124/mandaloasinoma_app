@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mandaloasinoma_app/data/data.dart';
 import 'package:mandaloasinoma_app/widgets/header_widget.dart';
 import 'package:mandaloasinoma_app/widgets/most_popular_widget.dart';
-
 import '../routes/routes.dart';
 import '../widgets/coming_soon_widget.dart';
 import '../widgets/doujin_widget.dart';
@@ -17,14 +16,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String _selectedItem = 'home';  // El ítem inicial seleccionado, cambia según tu lógica.
   String _currentRoute = HomeRoute;  // La ruta actual, cambia según tu lógica.
-  void _onNavBarItemSelect(String item) {
-    setState(() {
-      _selectedItem = item;
-    });
-    // Aquí también puedes manejar la lógica de navegación si es necesario.
-  }
 
   void _handleNavBarTap(String routeName) {
     setState(() {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import '../data/data.dart';
 import '../delegates/search_book_delegate.dart';
 

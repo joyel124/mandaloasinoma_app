@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mandaloasinoma_app/data/data.dart';
@@ -73,9 +72,21 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
             query: genre,
           );
         },
-        child: Chip(
-          label:
-              Text(genre), // configuración básica, estiliza según sea necesario
+        child: Transform.scale(
+          scale: 0.9,
+          child: Chip(
+            padding: const EdgeInsets.all(0),
+            label:
+                Text(
+                  genre,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    color: theme.backgroundColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ), // configuración básica, estiliza según sea necesario
+          ),
         ),
       );
     }).toList();
@@ -227,7 +238,7 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                           left: 16,
                           right: 16,
                           top: 16,
-                          bottom: showAll == false ? 0 : 16,
+                          bottom: showAll == false ? 8 : 16,
                         ),
                         decoration: BoxDecoration(
                           color: theme.backgroundColor,
@@ -295,13 +306,18 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                               ],
                             ),
                             const SizedBox(height: 8),
-                            Text(
-                              widget.book.title_jap,
-                              style: TextStyle(
-                                fontFamily: 'Oswald',
-                                color: theme.textColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
+                            SizedBox(
+                              width: 230,
+                              child: Text(
+                                textAlign: TextAlign.left,
+                                overflow: TextOverflow.ellipsis,
+                                widget.book.title_jap,
+                                style: TextStyle(
+                                  fontFamily: 'Oswald',
+                                  color: theme.textColor,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -330,13 +346,13 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 4),
                             Wrap(
-                              spacing: 8.0, // espacio entre los chips
-                              runSpacing: 0, // espacio entre las filas
+                              spacing: -4, // espacio entre los chips
+                              runSpacing: -10, // espacio entre las filas
                               children: _buildGenreChips(),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 0),
                             Row(
                               children: [
                                 Text(
@@ -361,7 +377,22 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                                       );
                                     },
                                     child:
-                                        Chip(label: Text(widget.book.author))),
+                                        Transform.scale(
+                                          scale: 0.9,
+                                          child: Chip(
+                                            padding: const EdgeInsets.all(0),
+                                              label: Text(
+                                                  widget.book.author,
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins',
+                                                    color: theme.backgroundColor,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                              )
+                                          ),
+                                        )
+                                ),
                                 const SizedBox(width: 4),
                               ],
                             ),

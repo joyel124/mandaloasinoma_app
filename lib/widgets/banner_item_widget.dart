@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
 import '../data/data.dart';
 import '../models/book.dart';
 import '../views/book_detail_view.dart';
@@ -24,6 +23,10 @@ class BannerItemBook extends StatelessWidget {
               image: DecorationImage(
                 image: NetworkImage(book.coverImg),
                 fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(0.4),
+                  BlendMode.darken,
+                ),
               ),
             ),
           ),
@@ -47,15 +50,6 @@ class BannerItemBook extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 26,
-                ),
-                decoration: const BoxDecoration(
-                  gradient: RadialGradient(
-                    radius: 0.6,
-                    colors: [
-                      Colors.black12,
-                      Colors.black54,
-                    ],
-                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

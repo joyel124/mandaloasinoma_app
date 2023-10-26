@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../data/data.dart';
 import '../models/book.dart';
 import '../services/books_service.dart';
-import '../widgets/book_item_widget.dart';
+import '../views/book_detail_view.dart';
 
 enum SearchType {
   author,
@@ -118,12 +118,59 @@ class SearchBookDelegate extends SearchDelegate {
                   crossAxisCount: 3,
                   crossAxisSpacing: 0,
                   mainAxisSpacing: 0,
-                  childAspectRatio: 0.6,
+                  childAspectRatio: 0.65,
                 ),
                 itemCount: books.length,
                 itemBuilder: (context, index) {
                   return InkWell(
-                      child: BookItem(book: books[index])
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BookDetail(
+                                    book: books[index],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 190*0.85,
+                              width: 128*0.85,
+                              margin: const EdgeInsets.only(right: 16),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                image: DecorationImage(
+                                  image: NetworkImage(books[index].coverImg),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: SizedBox(
+                              width: 128*0.85,
+                              child: Text(
+                                books[index].title,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  color: theme.textColor,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                   );
                 },
               ),
@@ -137,7 +184,12 @@ class SearchBookDelegate extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // Sugerencias que aparecen mientras el usuario escribe
+    if(query.isNotEmpty){
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Ahora que estamos seguros de que el widget se ha renderizado, podemos llamar a 'showResults'.
+        showResults(context);
+      });
+    }
     return Container();
   }
 }

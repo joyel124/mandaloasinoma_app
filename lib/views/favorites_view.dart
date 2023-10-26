@@ -1,9 +1,7 @@
-// lib/screens/favorite_screen.dart
 import 'package:flutter/material.dart';
 import 'package:mandaloasinoma_app/routes/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mandaloasinoma_app/data/data.dart';
-import '../data/data.dart';
 import '../models/book.dart';
 import '../services/books_service.dart';
 import '../widgets/navbar_widget.dart';
@@ -23,10 +21,8 @@ class Favorites extends StatefulWidget {
 }
 
 class _FavoritesState extends State<Favorites> {
-  // Esta lista es solo para demostración. En una aplicación real, estos datos vendrían de tu estado o base de datos.
   late Future<List<String>> _futureFavorites;
 
-  String _selectedItem = 'favorites';
   String _currentRoute = FavoritesRoute;
 
   void _handleNavBarTap(String routeName) {
@@ -36,13 +32,6 @@ class _FavoritesState extends State<Favorites> {
 
     // Cambiar la página utilizando el enrutador
     Navigator.of(context).pushReplacementNamed(routeName);
-  }
-
-  void _onNavBarItemSelect(String item) {
-    setState(() {
-      _selectedItem = item;
-    });
-    // Aquí también puedes manejar la lógica de navegación si es necesario.
   }
 
   @override

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:mandaloasinoma_app/routes/routes.dart';
 import 'package:mandaloasinoma_app/services/notification_service.dart';
 import 'firebase_options.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +25,7 @@ class MyApp extends StatelessWidget {
       title: 'MandaloAsiNoma App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(),
-      initialRoute: HomeRoute,
+      initialRoute: SplashRoute,
       routes: getApplicationRoutes(),
     );
   }
