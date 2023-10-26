@@ -9,10 +9,10 @@ class NavBar extends StatelessWidget {
   final String selectedItem;
 
   const NavBar({
-    Key? key,
+    super.key,
     required this.onItemSelected,
     required this.selectedItem,  // Puedes usar el valor que corresponda a tu ítem inicial.
-  }) : super(key: key);
+  });
 
   Widget _buildIconButton({
     required String routeName,

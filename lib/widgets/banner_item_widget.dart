@@ -6,105 +6,109 @@ import '../views/book_detail_view.dart';
 
 class BannerItemBook extends StatelessWidget {
   final Book book;
-  const BannerItemBook({super.key, required this.book});
+  const BannerItemBook({Key? key, required this.book}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Hero(
-          tag: book.title,
-          child: Container(
-            height: 200,
-            width: 296,
-            margin: const EdgeInsets.only(right: 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              image: DecorationImage(
-                image: NetworkImage(book.coverImg),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.4),
-                  BlendMode.darken,
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BookDetail(book: book),
+          ),
+        );
+      },
+      child: Stack(
+        children: [
+          Hero(
+            tag: book.title,
+            child: Container(
+              height: 200,
+              width: 296,
+              margin: const EdgeInsets.only(right: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                // La imagen ahora se cargará con un widget, en lugar de con DecorationImage.
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  book.coverImg,
+                  fit: BoxFit.cover,
+                  color: Colors.black.withOpacity(0.4),
+                  colorBlendMode: BlendMode.darken,
+                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;  // Si no hay progreso, la imagen se cargó correctamente.
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Center(child: Text('Error al cargar la imagen'));
+                  },
                 ),
               ),
             ),
           ),
-        ),
-        Positioned.fill(
-          child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BookDetail(
-                    book: book,
+          Positioned.fill(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 26),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    book.title,
+                    textAlign: TextAlign.left,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    style: TextStyle(
+                      fontFamily: 'Oswald',
+                      color: theme.textColor,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      shadows: const [
+                        Shadow(
+                          color: Colors.black54,
+                          offset: Offset(0, 4),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-            child: Center(
-              child: Container(
-                height: 200,
-                alignment: Alignment.bottomLeft,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 26,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      book.title,
-                      textAlign: TextAlign.left,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: TextStyle(
-                        fontFamily: 'Oswald',
-                        color: theme.textColor,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        shadows: const [
-                          Shadow(
-                            color: Colors.black54,
-                            offset: Offset(0, 4),
-                            blurRadius: 4,
+                  SizedBox(
+                    height: 24,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset('assets/icons/watch.svg'),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${book.visits}',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            color: theme.textColor,
+                            fontSize: 12,
+                            height: 2,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      height: 24,
-                      child: Row(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/watch.svg',
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${book.visits}',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              color: theme.textColor,
-                              fontSize: 12,
-                              height: 2,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

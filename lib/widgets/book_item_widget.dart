@@ -6,7 +6,7 @@ import '../views/book_detail_view.dart';
 class BookItem extends StatelessWidget {
   final Book book;
 
-  const BookItem({super.key, required this.book});
+  const BookItem({Key? key, required this.book}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +28,30 @@ class BookItem extends StatelessWidget {
             height: 190,
             width: 128,
             margin: const EdgeInsets.only(right: 16),
-            decoration: BoxDecoration(
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              image: DecorationImage(
-                image: NetworkImage(book.coverImg),
+              child: Image.network(
+                book.coverImg,
                 fit: BoxFit.cover,
+                width: 128,
+                height: 190,
+                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;  // Si `loadingProgress` es null, significa que la imagen se cargó correctamente.
+                  }
+                  return Center(
+                    child: CircularProgressIndicator(
+                      // Aquí puedes manejar la lógica del valor actual del progreso, si quieres que sea determinado.
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  // Maneja cualquier error ocurrido durante la carga de la imagen.
+                  return const Center(child: Text('Error al cargar la imagen'));
+                },
               ),
             ),
           ),

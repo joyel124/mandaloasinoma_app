@@ -8,6 +8,7 @@ enum SearchType {
   author,
   name,
   genre,
+  type,
 }
 
 class SearchBookDelegate extends SearchDelegate {
@@ -86,6 +87,9 @@ class SearchBookDelegate extends SearchDelegate {
       case SearchType.genre:
         searchFunction = bookService.getBooksByGenre;
         break;
+      case SearchType.type:
+        searchFunction = bookService.getBooksByType;
+        break;
       case SearchType.name:
       default:
         searchFunction = bookService.getBooksByName;
@@ -141,11 +145,28 @@ class SearchBookDelegate extends SearchDelegate {
                               height: 190*0.85,
                               width: 128*0.85,
                               margin: const EdgeInsets.only(right: 16),
-                              decoration: BoxDecoration(
+                              child: ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
-                                image: DecorationImage(
-                                  image: NetworkImage(books[index].coverImg),
+                                child: Image.network(
+                                  books[index].coverImg,
                                   fit: BoxFit.cover,
+                                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                    if (loadingProgress == null) {
+                                      return child;  // Si `loadingProgress` es null, significa que la imagen se cargó correctamente.
+                                    }
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        // Aquí puedes manejar la lógica del valor actual del progreso, si quieres que sea determinado.
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    // Maneja cualquier error ocurrido durante la carga de la imagen.
+                                    return const Center(child: Text('Error al cargar la imagen'));
+                                  },
                                 ),
                               ),
                             ),

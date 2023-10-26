@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:mandaloasinoma_app/data/data.dart';
 
+import '../models/book.dart';
+import '../services/books_service.dart';
+import 'book_item_widget.dart';
+
 class ComingSoonSection extends StatelessWidget {
   const ComingSoonSection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final bookService = BookService();
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start, // Alinea los elementos a la izquierda.
+      crossAxisAlignment:
+          CrossAxisAlignment.start, // Alinea los elementos a la izquierda.
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -25,60 +31,52 @@ class ComingSoonSection extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              Text(
-                'See more',
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  color: theme.accentColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ],
           ),
         ),
         const SizedBox(height: 8),
-        SizedBox(
-          height: 216,
-          child: ListView.builder(
-            padding: const EdgeInsets.only(left: 16.0),
-            scrollDirection: Axis.horizontal,
-            itemCount: commingSoon.length,
-            itemBuilder: (context, index) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 190,
-                    width: 128,
-                    margin: const EdgeInsets.only(right: 16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      image: DecorationImage(
-                        image: commingSoon[index].image,
-                        fit: BoxFit.cover,
-                      ),
+        FutureBuilder<List<Book>>(
+          future: bookService
+              .getComingSoonBooks(), // La llamada al método que recupera los libros de Firebase.
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // Proporcionar un indicador de carga mientras esperamos.
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              // Manejo de errores.
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              // Manejar el caso de no datos.
+              return Center(
+                child: Text(
+                    'No hay mangas proximamente',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: theme.textColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
-                    child: Text(
-                      commingSoon[index].title,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: theme.textColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               );
-            },
-          ),
+            } else {
+              // Los datos están disponibles, construir la lista.
+              List<Book> books = snapshot.data!;
+              int maxBooksToShow = 5;
+              books = (books.length > maxBooksToShow) ? books.sublist(0, maxBooksToShow) : books;
+              return SizedBox(
+                height: 216,
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(left: 16.0),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: books.length,
+                  itemBuilder: (context, index) {
+                    var book = books[index];
+                    return BookItem(book: book);
+                  },
+                ),
+              );
+            }
+          },
         ),
         const SizedBox(height: 94),
       ],

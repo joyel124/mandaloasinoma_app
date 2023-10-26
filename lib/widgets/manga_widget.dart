@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mandaloasinoma_app/data/data.dart';
 import 'package:mandaloasinoma_app/widgets/book_item_widget.dart';
+import '../delegates/search_book_delegate.dart';
 import '../models/book.dart';
 import '../services/books_service.dart';
 
@@ -30,14 +31,24 @@ class MangasSection extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              Text(
-                'Ver más',
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  color: theme.accentColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+              InkWell(
+                onTap: () {
+                  showSearch(
+                    context: context,
+                    delegate: SearchBookDelegate(SearchType.type), // Este es tu SearchDelegate personalizado.
+                    // El query es el término de búsqueda; establecemos el género como el término inicial de búsqueda.
+                    query: "manga",
+                  );
+                },
+                child: Text(
+                  'Ver más',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    color: theme.accentColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -60,6 +71,8 @@ class MangasSection extends StatelessWidget {
             } else {
               // Los datos están disponibles, construir la lista.
               List<Book> books = snapshot.data!;
+              int maxBooksToShow = 5;
+              books = (books.length > maxBooksToShow) ? books.sublist(0, maxBooksToShow) : books;
 
               return SizedBox(
                 height: 216,
