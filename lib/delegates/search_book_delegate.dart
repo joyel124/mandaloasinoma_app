@@ -104,7 +104,9 @@ class SearchBookDelegate extends SearchDelegate {
           // ... (el resto es igual, maneja la construcción de la UI según los datos recibidos)
           if (snapshot.connectionState == ConnectionState.waiting) {
             // Si estamos esperando los resultados, muestra un indicador de carga
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator(
+              color: theme.accentColor,
+            ));
           } else if (snapshot.hasError) {
             // En caso de error, muestra un mensaje al usuario
             return Center(child: Text('Ha ocurrido un error: ${snapshot.error}'));
@@ -157,9 +159,7 @@ class SearchBookDelegate extends SearchDelegate {
                                     return Center(
                                       child: CircularProgressIndicator(
                                         // Aquí puedes manejar la lógica del valor actual del progreso, si quieres que sea determinado.
-                                        value: loadingProgress.expectedTotalBytes != null
-                                            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                            : null,
+                                        color: theme.accentColor,
                                       ),
                                     );
                                   },

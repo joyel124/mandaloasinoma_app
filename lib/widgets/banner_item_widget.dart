@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import '../data/data.dart';
 import '../models/book.dart';
+import '../models/content_provider.dart';
 import '../views/book_detail_view.dart';
+import '../views/key_view.dart';
 
 class BannerItemBook extends StatelessWidget {
   final Book book;
@@ -10,12 +13,13 @@ class BannerItemBook extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final contenidoProvider = Provider.of<ContenidoProvider>(context, listen: true);
     return InkWell(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => BookDetail(book: book),
+            builder: (context) => contenidoProvider.contenidoDesbloqueado?BookDetail(book: book): KeyView(),
           ),
         );
       },
@@ -33,7 +37,7 @@ class BannerItemBook extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.network(
+                child: contenidoProvider.contenidoDesbloqueado?Image.network(
                   book.coverImg,
                   fit: BoxFit.cover,
                   color: Colors.black.withOpacity(0.4),
@@ -44,16 +48,15 @@ class BannerItemBook extends StatelessWidget {
                     }
                     return Center(
                       child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                            : null,
+                        color: theme.accentColor,
                       ),
                     );
                   },
                   errorBuilder: (context, error, stackTrace) {
                     return const Center(child: Text('Error al cargar la imagen'));
                   },
-                ),
+                ):
+                const Image(image: AssetImage('assets/img/placeholder-app.jpg'), fit: BoxFit.cover),
               ),
             ),
           ),

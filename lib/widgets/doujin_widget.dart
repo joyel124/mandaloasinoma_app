@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mandaloasinoma_app/data/data.dart';
 import 'package:mandaloasinoma_app/widgets/book_item_widget.dart';
+import 'package:provider/provider.dart';
 import '../delegates/search_book_delegate.dart';
 import '../models/book.dart';
+import '../models/content_provider.dart';
 import '../services/books_service.dart';
+import '../views/key_view.dart';
 
 class DoujinsSection extends StatelessWidget {
   const DoujinsSection({Key? key}) : super(key: key);
@@ -11,6 +14,7 @@ class DoujinsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bookService = BookService();
+    final contenidoProvider = Provider.of<ContenidoProvider>(context, listen: true);
     return Column(
       crossAxisAlignment:
       CrossAxisAlignment.start, // Alinea los elementos a la izquierda.
@@ -33,11 +37,14 @@ class DoujinsSection extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  showSearch(
+                  contenidoProvider.contenidoDesbloqueado?showSearch(
                     context: context,
                     delegate: SearchBookDelegate(SearchType.type), // Este es tu SearchDelegate personalizado.
                     // El query es el término de búsqueda; establecemos el género como el término inicial de búsqueda.
                     query: "doujin",
+                  ):
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => KeyView())
                   );
                 },
                 child: Text(
@@ -61,7 +68,9 @@ class DoujinsSection extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // Proporcionar un indicador de carga mientras esperamos.
-              return const Center(child: CircularProgressIndicator());
+              return Center(child: CircularProgressIndicator(
+                color: theme.accentColor,
+              ));
             } else if (snapshot.hasError) {
               // Manejo de errores.
               return Center(child: Text('Error: ${snapshot.error}'));

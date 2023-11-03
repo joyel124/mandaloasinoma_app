@@ -34,7 +34,9 @@ class MostPopularSection extends StatelessWidget{
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 // Proporcionar un indicador de carga mientras esperamos.
-                return const Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator(
+                  color: theme.accentColor,
+                ));
               } else if (snapshot.hasError) {
                 // Manejo de errores.
                 return Center(child: Text('Error: ${snapshot.error}'));

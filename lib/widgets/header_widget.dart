@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import '../data/data.dart';
 import '../delegates/search_book_delegate.dart';
+import '../models/content_provider.dart';
+import '../views/key_view.dart';
 
 class Header extends StatefulWidget {
   const Header({Key? key}) : super(key: key);
@@ -14,6 +17,7 @@ class _HeaderState extends State<Header> {
 
   @override
   Widget build(BuildContext context) {
+    final contenidoProvider = Provider.of<ContenidoProvider>(context, listen: true);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 16,
@@ -37,9 +41,12 @@ class _HeaderState extends State<Header> {
           ),
           const Spacer(),
           IconButton(onPressed: () {
-            showSearch(
+            contenidoProvider.contenidoDesbloqueado?showSearch(
                 context: context,
                 delegate: SearchBookDelegate(SearchType.name)
+            ): Navigator.push(context,
+              MaterialPageRoute(builder: (context) => KeyView(),
+            ),
             );
           },
           icon: SvgPicture.asset(

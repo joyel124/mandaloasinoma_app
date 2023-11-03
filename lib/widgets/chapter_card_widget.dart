@@ -53,6 +53,16 @@ class ChapterCard extends StatelessWidget {
                 child: Image(
                   image: NetworkImage(chapterImage),
                   fit: BoxFit.cover,
+                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;  // Si `loadingProgress` es null, significa que la imagen se cargó correctamente.
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: theme.accentColor,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),

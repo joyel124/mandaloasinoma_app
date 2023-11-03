@@ -3,11 +3,14 @@ import 'package:mandaloasinoma_app/data/data.dart';
 import 'package:mandaloasinoma_app/routes/routes.dart';
 import 'package:mandaloasinoma_app/services/authors_service.dart';
 import 'package:mandaloasinoma_app/services/genders_service.dart';
+import 'package:provider/provider.dart';
 import '../delegates/search_book_delegate.dart';
 import '../models/author.dart';
+import '../models/content_provider.dart';
 import '../models/gender.dart';
 import '../widgets/circle_item_widget.dart';
 import '../widgets/navbar_widget.dart';
+import 'key_view.dart';
 
 class Explorer extends StatefulWidget {
   const Explorer({Key? key}) : super(key: key);
@@ -18,11 +21,9 @@ class Explorer extends StatefulWidget {
 class _ExplorerState extends State<Explorer> {
   // Suponiendo que tienes datos de ejemplo para géneros y autores
 
-  late Future<List<String>> _futureFavorites;
   late Future<List<Author>> _authorsFuture;
   late Future<List<Gender>> _genresFuture;
 
-  String _selectedItem = 'explorer';
   String _currentRoute = ExplorerRoute;
   // El ítem inicial seleccionado, cambia según tu lógica.
 
@@ -32,13 +33,6 @@ class _ExplorerState extends State<Explorer> {
     // Inicializa las solicitudes de obtención de datos
     _authorsFuture = AuthorService().getAllAuthors();
     _genresFuture = GenderService().getAllGenres();
-  }
-
-  void _onNavBarItemSelect(String item) {
-    setState(() {
-      _selectedItem = item;
-    });
-    // Aquí también puedes manejar la lógica de navegación si es necesario.
   }
 
   void _handleNavBarTap(String routeName) {
@@ -52,6 +46,7 @@ class _ExplorerState extends State<Explorer> {
 
   @override
   Widget build(BuildContext context) {
+    final contenidoProvider = Provider.of<ContenidoProvider>(context, listen: true);
     return Scaffold(
       floatingActionButton: NavBar(
         onItemSelected: _handleNavBarTap, // Pasando el manejador.
@@ -92,7 +87,9 @@ class _ExplorerState extends State<Explorer> {
               future: _genresFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator(
+                    color: theme.accentColor,
+                  ));
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -110,15 +107,18 @@ class _ExplorerState extends State<Explorer> {
                       return InkWell(
                         onTap: () {
                           // 'showSearch' inicia el 'SearchDelegate' que hemos definido.
-                          showSearch(
+                          contenidoProvider.contenidoDesbloqueado?showSearch(
                             context: context,
                             delegate: SearchBookDelegate(SearchType.genre), // Este es tu SearchDelegate personalizado.
                             // El query es el término de búsqueda; establecemos el género como el término inicial de búsqueda.
                             query: genre.genderName,
+                          ):
+                          Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => KeyView())
                           );
                         },
                         child: Chip(
-                          label: Text(genre.genderName),
+                          label: contenidoProvider.contenidoDesbloqueado?Text(genre.genderName):const Icon(Icons.lock),
                           backgroundColor: theme.accentColor,
                           labelStyle: TextStyle(
                             fontFamily: 'Poppins',
@@ -151,8 +151,10 @@ class _ExplorerState extends State<Explorer> {
               future: _authorsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                      child: CircularProgressIndicator()); // Cargando
+                  return Center(
+                      child: CircularProgressIndicator(
+                    color: theme.accentColor,
+                      )); // Cargando
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -181,11 +183,13 @@ class _ExplorerState extends State<Explorer> {
                         return InkWell(
                             onTap: () {
                               // 'showSearch' inicia el 'SearchDelegate' que hemos definido.
-                              showSearch(
+                              contenidoProvider.contenidoDesbloqueado?showSearch(
                                 context: context,
                                 delegate: SearchBookDelegate(SearchType.author), // Este es tu SearchDelegate personalizado.
                                 // El query es el término de búsqueda; establecemos el nombre del autor como el término inicial de búsqueda.
                                 query: authors[index].authorName,
+                              ): Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => KeyView())
                               );
                             },
                             child: CircleItem(

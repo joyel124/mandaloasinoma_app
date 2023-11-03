@@ -19,13 +19,17 @@ class NavBar extends StatelessWidget {
     required String assetName,
     required Color color,
   }) {
-    return SizedBox(
-      height: 24,
-      width: 24,
-      child: IconButton(
-        padding: const EdgeInsets.all(0),
-        onPressed: () => onItemSelected(routeName),
-        icon: SvgPicture.asset(assetName, color: color),
+    bool isSelected = routeName == selectedItem;
+    return Transform.scale(
+      scale: isSelected ? 1.2 : 1.0,
+      child: SizedBox(
+        height: 24,
+        width: 24,
+        child: IconButton(
+          padding: const EdgeInsets.all(0),
+          onPressed: () => onItemSelected(routeName),
+          icon: SvgPicture.asset(assetName, color: color),
+        ),
       ),
     );
   }

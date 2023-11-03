@@ -94,7 +94,9 @@ class _FavoritesState extends State<Favorites> {
           }
 
           // Mientras se carga la información, muestra un indicador de progreso
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator(
+            color: theme.accentColor,
+          ));
         },
       ),
     );

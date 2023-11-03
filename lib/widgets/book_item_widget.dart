@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../data/data.dart';
 import '../models/book.dart';
+import '../models/content_provider.dart';
 import '../views/book_detail_view.dart';
+import '../views/key_view.dart';
 
 class BookItem extends StatelessWidget {
   final Book book;
@@ -10,6 +13,7 @@ class BookItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final contenidoProvider = Provider.of<ContenidoProvider>(context, listen: true);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -18,9 +22,10 @@ class BookItem extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => BookDetail(
+                builder: (context) => contenidoProvider.contenidoDesbloqueado?BookDetail(
                   book: book,
-                ),
+                ):
+                KeyView(),
               ),
             );
           },
@@ -30,7 +35,7 @@ class BookItem extends StatelessWidget {
             margin: const EdgeInsets.only(right: 16),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.network(
+              child: contenidoProvider.contenidoDesbloqueado?Image.network(
                 book.coverImg,
                 fit: BoxFit.cover,
                 width: 128,
@@ -41,10 +46,7 @@ class BookItem extends StatelessWidget {
                   }
                   return Center(
                     child: CircularProgressIndicator(
-                      // Aquí puedes manejar la lógica del valor actual del progreso, si quieres que sea determinado.
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                          : null,
+                      color: theme.accentColor,
                     ),
                   );
                 },
@@ -52,7 +54,8 @@ class BookItem extends StatelessWidget {
                   // Maneja cualquier error ocurrido durante la carga de la imagen.
                   return const Center(child: Text('Error al cargar la imagen'));
                 },
-              ),
+              ):
+              const Image(image: AssetImage('assets/img/placeholder-app.jpg'), fit: BoxFit.cover),
             ),
           ),
         ),

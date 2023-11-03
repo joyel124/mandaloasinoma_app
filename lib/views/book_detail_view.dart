@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mandaloasinoma_app/data/data.dart';
 import 'package:mandaloasinoma_app/models/book.dart';
+import 'package:mandaloasinoma_app/services/books_service.dart';
 import 'package:mandaloasinoma_app/widgets/chapter_card_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -109,6 +110,7 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
     _controller.animateTo(0.2);
     _initFavorito();
     _controllerFade.forward();
+    BookService().incrementViewCount(widget.book.id);
     super.initState();
   }
 
@@ -277,7 +279,7 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                                   height: 18,
                                 ),
                                 const SizedBox(width: 4),
-                                Text(
+                                /*Text(
                                   '${widget.book.visits}',
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
@@ -286,7 +288,7 @@ class _BookDetailState extends State<BookDetail> with TickerProviderStateMixin {
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
-                                ),
+                                ),*/
                                 const SizedBox(width: 16),
                                 SvgPicture.asset(
                                   'assets/icons/watch.svg',

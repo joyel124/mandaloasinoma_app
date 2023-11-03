@@ -194,4 +194,24 @@ class BookService {
     }
   }
 
+  Future<void> incrementViewCount(String bookId) async {
+    try {
+      DocumentReference mangaRef = _db.collection('book').doc(bookId);
+
+      await _db.runTransaction((Transaction transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(mangaRef);
+
+        if (!snapshot.exists) {
+          throw Exception("Document does not exist!");
+        }
+
+        int newViews = (snapshot.data() as Map<String, dynamic>)['visits'] + 1;
+        transaction.update(mangaRef, {'visits': newViews});
+      });
+    } catch (e) {
+      print("Error al incrementar el contador de vistas: $e");
+    }
+  }
+
+
 }
